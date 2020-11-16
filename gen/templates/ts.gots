@@ -1,0 +1,48 @@
+{{- $f := . }}
+{{- range .Imports }}
+{{ FormatImport . $f }}
+{{- end }}
+
+{{- range $e := .Enums }}
+{{ $e.Comment | Leading -}}
+export enum {{ $e.Name }} {
+    {{- range .Fields }}
+    {{ .Comment | Leading -}}
+    {{ .Name }} = "{{ .Value }}", {{ .Comment | Trailing }} //{{ .Index }}
+    {{- end }}
+}
+{{- end }}
+
+{{- range .Messages }}
+{{ .Comment | Leading -}}
+export type {{ .Name }} = {
+    {{- range .Fields }}
+    {{ .Comment | Leading -}}
+    {{ . | FormatField }} {{ .Comment | Trailing }}
+    {{- end }}
+}
+{{- end }}
+
+{{- if .Services }}
+type Fetch = <T>(url: string, param: any) => Promise<T>;
+{{- end }}
+
+{{- range .Services }}
+{{ .Comment | Leading -}}
+export class {{ .Name }}Client {
+    private readonly base: string;
+    private readonly fetch: Fetch;
+    
+    constructor(serverUrl: string, fetch: Fetch) {
+        this.fetch = fetch;
+        this.base = serverUrl + "/{{ $f.ApiPrefix }}/{{ .Name | UnderlineCase }}";
+    }
+
+    {{- range .Methods }}
+    {{ .Comment | Leading -}}
+    {{ .Name }}(input: {{ .Input | FormatType }}): Promise<{{ .Output | FormatType }}> {
+        return this.fetch<{{ .Output | FormatType }}>(this.base + "/{{ .Name | UnderlineCase }}", input);
+    }
+    {{- end }}
+}
+{{- end }}

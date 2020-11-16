@@ -1,0 +1,115 @@
+//Path {{ .Path }}
+{{- $f := . }}
+package {{ .Package }}
+import (
+    "context"
+    "encoding/json"
+	"net/http"
+
+    {{- range .Imports }}
+    {{ FormatImport . $f }}
+    {{- end }}
+)
+
+{{ range $e := .Enums }}
+{{ $e.Comment | Leading -}}
+type {{ $e.Name }} string
+
+const (
+    {{- range .Fields }}
+    {{ .Comment | Leading -}}
+    {{ .Name }} {{ $e.Name }} = {{ .Value }} {{ .Comment | Trailing }}
+    {{- end }}
+)
+{{- end }}
+
+{{- range .Messages }}
+{{ .Comment | Leading -}}
+type {{ .Name }} struct {
+    {{- range .Fields }}
+    {{ .Comment | Leading -}}
+    {{ . | FormatField }} {{ .Comment | Trailing }}
+    {{- end }}
+}
+
+{{ end }}
+
+{{- range .Services }}
+{{ .Comment | Leading -}}
+type {{ .Name }}Service interface {
+{{- range .Methods }}
+    {{ .Comment | Leading -}}
+    {{ .Name }}(ctx context.Context, in *{{ .Input | FormatType }}) (*{{ .Output | FormatType }}, error) {{ .Comment | Trailing }}
+{{- end }}
+}
+
+{{ end }}
+
+{{- range $s := .Services }}
+func Register{{ $s.Name }}Service(s {{ $s.Name }}Service) http.Handler {
+
+	handleError := func(w http.ResponseWriter, httpCode int, err error) bool {
+		if err == nil {
+			return false
+		}
+		var (
+			code int
+			msg  string
+			data interface{}
+		)
+
+		if coder, yes := err.(interface{ Code() int }); yes {
+			code = coder.Code()
+		} else {
+			code = httpCode
+		}
+
+		if massager, yes := err.(interface{ Message() string }); yes {
+			msg = massager.Message()
+		} else {
+			msg = err.Error()
+		}
+
+		if d, yes := err.(interface{ Data() interface{} }); yes {
+			data = d.Data()
+		}
+
+		w.WriteHeader(code)
+		json.NewEncoder(w).Encode(map[string]interface{}{"code": code, "msg": msg, "data": data})
+		return true
+	}
+
+	decode := func(w http.ResponseWriter, r *http.Request, in interface{}) bool {
+		decoder := json.NewDecoder(r.Body)
+		decoder.DisallowUnknownFields()
+		return handleError(w, 400, decoder.Decode(&in))
+	}
+
+	encode := func(w http.ResponseWriter, out interface{}) bool {
+		return handleError(w, 500, json.NewEncoder(w).Encode(out))
+	}
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		{{- range $m := $s.Methods }}
+		case "/{{ $f.ApiPrefix }}/{{ $s.Name | UnderlineCase }}/{{ $m.Name | UnderlineCase }}":
+			var in {{ $m.Input | FormatType }}
+			if !decode(w, r, &in) {
+				if out, err := s.{{ $m.Name }}(r.Context(), &in); !handleError(w, 400, err) {
+					encode(w, out)
+				}
+			}
+			return
+		{{- end }}
+		default:
+			http.NotFound(w, r)
+			return
+		}
+	})
+}
+
+{{ end -}}
+
+var _ context.Context
+var _ http.Handler
+var _ json.Marshaler
