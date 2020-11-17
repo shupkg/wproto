@@ -18,7 +18,7 @@ type {{ $e.Name }} string
 const (
     {{- range .Fields }}
     {{ .Comment | Leading -}}
-    {{ .Name }} {{ $e.Name }} = {{ .Value }} {{ .Comment | Trailing }}
+    {{ .Name }} {{ $e.Name }} = "{{ .Value | UnderlineCase }}" {{ .Comment | Trailing }}
     {{- end }}
 )
 {{- end }}
