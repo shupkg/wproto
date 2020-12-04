@@ -1,5 +1,5 @@
 
 install:
-	cd gen/templates && wbin . -f
+	cd gen/templates && wtool embed . -f
 	CGO_ENABLED=0 go install ./cmd/wproto
 

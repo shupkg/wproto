@@ -28,7 +28,7 @@ const EmptyImport = protogen.GoImportPath("")
 */
 
 func Run(plugin *protogen.Plugin) error {
-	log.Println("parameter:" + plugin.Request.GetParameter())
+	//log.Println("parameter:" + plugin.Request.GetParameter())
 	params := ParseParam(plugin.Request.GetParameter())
 	mod := params.Get("module")
 
@@ -48,7 +48,7 @@ func Run(plugin *protogen.Plugin) error {
 				if err != nil {
 					log.Fatal(err)
 				}
-				log.Println(f.GeneratedFilenamePrefix + ".gos.model.go")
+				//log.Println(f.GeneratedFilenamePrefix + ".gos.model.go")
 				plugin.NewGeneratedFile(f.GeneratedFilenamePrefix+".gos.model.go", EmptyImport).Write(GoFmt(buf.Bytes()))
 			}
 		}
@@ -60,7 +60,7 @@ func Run(plugin *protogen.Plugin) error {
 				if err != nil {
 					log.Fatal(err)
 				}
-				log.Println(f.GeneratedFilenamePrefix + ".gos.rpc.go")
+				//log.Println(f.GeneratedFilenamePrefix + ".gos.rpc.go")
 				plugin.NewGeneratedFile(f.GeneratedFilenamePrefix+".gos.rpc.go", EmptyImport).Write(GoFmt(buf.Bytes()))
 			}
 		}
@@ -72,7 +72,7 @@ func Run(plugin *protogen.Plugin) error {
 				if err != nil {
 					log.Fatal(err)
 				}
-				log.Println(f.GeneratedFilenamePrefix + ".gos.client.ts")
+				//log.Println(f.GeneratedFilenamePrefix + ".gos.client.ts")
 				plugin.NewGeneratedFile(f.GeneratedFilenamePrefix+".gos.client.ts", EmptyImport).Write(buf.Bytes())
 			}
 		}
