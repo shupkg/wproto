@@ -3,10 +3,10 @@ package gen
 import (
 	"bytes"
 	"log"
-	"net/url"
-	"path/filepath"
 	"strings"
 	"text/template"
+
+	"github.com/shupkg/wproto/gen/templates"
 
 	"google.golang.org/protobuf/compiler/protogen"
 )
@@ -26,75 +26,55 @@ const EmptyImport = protogen.GoImportPath("")
 "string"
 "bytes"
 */
-type Formatter interface {
-	Template() string
-	FormatField(field MessageField) string
-	Leading(c Comment) string
-	Trailing(c Comment) string
-	FormatType(goType string) string
-	FormatImport(i Import, f File) string
-}
-
-func ToFuncMap(f Formatter) template.FuncMap {
-	return template.FuncMap{
-		"FormatImport":  f.FormatImport,
-		"FormatField":   f.FormatField,
-		"Leading":       f.Leading,
-		"Trailing":      f.Trailing,
-		"FormatType":    f.FormatType,
-		"UnderlineCase": SnakeCase,
-	}
-}
 
 func Run(plugin *protogen.Plugin) error {
-	params, _ := url.ParseQuery(plugin.Request.GetParameter())
-	root := params.Get("root")
-	if root != "" {
-		if !strings.HasSuffix(root, "/") {
-			root += "/"
-		}
-	}
+	log.Println("parameter:" + plugin.Request.GetParameter())
+	params := ParseParam(plugin.Request.GetParameter())
+	mod := params.Get("module")
 
 	for _, f := range plugin.Files {
-		//确定文件名
-		filename := filepath.Join(
-			string(f.GoImportPath),
-			strings.TrimSuffix(filepath.Base(f.Desc.Path()), filepath.Ext(f.Desc.Path())),
-		)
-		if !strings.HasPrefix(filename, root) {
-			continue
+		if mod != "" {
+			if !strings.HasPrefix(string(f.GoImportPath), mod) {
+				continue
+			}
 		}
-		filename = strings.TrimPrefix(filename, root)
-
 		model := ParseFile(f)
-		model.ApiPrefix = strings.TrimPrefix(model.ImportPath, root)
+		model.ApiPrefix = strings.Trim(strings.TrimPrefix(model.ImportPath, mod), "/")
 
-		goOut := params.Get("go")
-		if goOut != "" {
-			var (
-				formatter = &GoFormatter{}
-				buf       = &bytes.Buffer{}
-			)
-
-			err := template.Must(template.New("").Funcs(ToFuncMap(formatter)).Parse(formatter.Template())).Execute(buf, model)
-			if err != nil {
-				log.Fatal(err)
+		if params.GetBool("gos_model") {
+			if len(model.Messages) > 0 || len(model.Enums) > 0 {
+				var buf = &bytes.Buffer{}
+				err := template.Must(template.New("").Parse(string(templates.GosModelGogo.Bytes()))).Execute(buf, model)
+				if err != nil {
+					log.Fatal(err)
+				}
+				log.Println(f.GeneratedFilenamePrefix + ".gos.model.go")
+				plugin.NewGeneratedFile(f.GeneratedFilenamePrefix+".gos.model.go", EmptyImport).Write(GoFmt(buf.Bytes()))
 			}
-			plugin.NewGeneratedFile(filepath.Join(goOut, filename+".go"), EmptyImport).Write(GoFmt(buf.Bytes()))
 		}
 
-		tsOut := params.Get("ts")
-		if tsOut != "" {
-			var (
-				formatter = &TsFormatter{}
-				buf       = &bytes.Buffer{}
-			)
-
-			err := template.Must(template.New("").Funcs(ToFuncMap(formatter)).Parse(formatter.Template())).Execute(buf, model)
-			if err != nil {
-				log.Fatal(err)
+		if params.GetBool("gos_rpc") {
+			if len(model.Services) > 0 {
+				var buf = &bytes.Buffer{}
+				err := template.Must(template.New("").Parse(string(templates.GosRpcGogo.Bytes()))).Execute(buf, model)
+				if err != nil {
+					log.Fatal(err)
+				}
+				log.Println(f.GeneratedFilenamePrefix + ".gos.rpc.go")
+				plugin.NewGeneratedFile(f.GeneratedFilenamePrefix+".gos.rpc.go", EmptyImport).Write(GoFmt(buf.Bytes()))
 			}
-			plugin.NewGeneratedFile(filepath.Join(tsOut, filename+".ts"), EmptyImport).Write(buf.Bytes())
+		}
+
+		if params.GetBool("gos_ts") {
+			if len(model.Services) > 0 || len(model.Messages) > 0 || len(model.Enums) > 0 {
+				var buf = &bytes.Buffer{}
+				err := template.Must(template.New("").Parse(string(templates.GosClientGots.Bytes()))).Execute(buf, model)
+				if err != nil {
+					log.Fatal(err)
+				}
+				log.Println(f.GeneratedFilenamePrefix + ".gos.client.ts")
+				plugin.NewGeneratedFile(f.GeneratedFilenamePrefix+".gos.client.ts", EmptyImport).Write(buf.Bytes())
+			}
 		}
 	}
 	return nil

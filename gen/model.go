@@ -1,15 +1,15 @@
 package gen
 
 type File struct {
-	Path       string            `json:",omitempty"`
-	Package    string            `json:",omitempty"`
-	ApiPrefix  string            `json:",omitempty"`
-	ImportPath string            `json:",omitempty"`
-	ImportMap  map[string]string `json:",omitempty"`
-	Imports    []Import          `json:",omitempty"`
-	Enums      []Enum            `json:",omitempty"`
-	Messages   []Message         `json:",omitempty"`
-	Services   []Service         `json:",omitempty"`
+	Path       string
+	Package    string
+	ApiPrefix  string
+	ImportPath string
+	ImportMap  map[string]string
+	Imports    []Import
+	Enums      []Enum
+	Messages   []Message
+	Services   []Service
 }
 
 type Import struct {
@@ -20,24 +20,24 @@ type Import struct {
 
 type Message struct {
 	Name   string
-	Fields []MessageField `json:",omitempty"`
+	Fields []MessageField
 	Comment
 }
 
 type MessageField struct {
 	Name    string
 	JsName  string
-	Type    string `json:",omitempty"`
-	IsArray bool   `json:",omitempty"`
-	MapKey  string `json:",omitempty"`
-	Pointer bool   `json:",omitempty"`
+	Type    string
+	IsArray bool
+	MapKey  string
+	Pointer bool
 	Index   int
 	Comment
 }
 
 type Enum struct {
 	Name   string
-	Fields []EnumField `json:",omitempty"`
+	Fields []EnumField
 	Comment
 }
 
@@ -50,20 +50,20 @@ type EnumField struct {
 
 type Service struct {
 	Name    string
-	Methods []ServiceMethod `json:",omitempty"`
+	Methods []ServiceMethod
 	Comment
 }
 
 type ServiceMethod struct {
 	Name   string
-	Input  string `json:",omitempty"`
-	Output string `json:",omitempty"`
+	Input  string
+	Output string
 	Comment
 }
 
 //注释
 type Comment struct {
-	LeadingDetached []string `json:",omitempty"`
-	Leading         string   `json:",omitempty"`
-	Trailing        string   `json:",omitempty"`
+	LeadingDetached []string
+	Leading         string
+	Trailing        string
 }

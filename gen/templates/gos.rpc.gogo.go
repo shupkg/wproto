@@ -1,0 +1,29 @@
+package templates
+
+import (
+	"github.com/shupkg/wbin"
+)
+
+var GosRpcGogo = &wbin.File{
+	FileName:    "gos.rpc.gogo",
+	FileModTime: 1607050420,
+	FileSize:    2219,
+	Data: `
+H4sIAAAAAAAC/5RVS2+kRhA+w6+oRVYEFtvsIbnMag6Jx9Za8kuOrRyiKGpDwfQaukl3s9hC/PeoumGG
+8WNXe4Ku1/fVV00xDB8hO66UfW5xBZWw2+6B5arJzLZrH6usb7WyKqtQsjNR43EGH8cxzDI4UQVChRI1
+t1jAwzP4UAaba7i6voPTzfkdo0ijOp3jCoYB2A23WxjHMCTcoxJWa2B0bnn+yCukmKOS3UyncQxF0ypt
+IQ4BAKJcSYtPNvInlLkqhKyyr0bJKAwiiTbbWttGoQsgDM1lhcDOXRlDFb0H2PXDV8wtjCNEntmMGe2S
+URaUkRDdudKfqL+JHF0pyjtRTYPSshstpL1AToQgyrLICUWyOrQr3lDtKRuEtKhLniMM4YLmJdqtKg5o
+fr/+FHVUsvu2Re1QZqw4t08wKcZO/DMFIeH4Vca5bDuSIoH4tfO6s96bAmqtdPKa153mot4Rc8rs1HPD
+ng+LZo+Mm/5Sz7KTOdxiJYxFTTzMC91iA2+ZE6Cpsy9cFjVqGMIw2Lr3U+JLMFQ57n3YLZpWSYN/aWFR
+p87obrOQ1rU4t/mgVA1DGASidOb1GqTwlkCj7bSEktcGwyAYwyD4xjXE5MunYvTemArAWC1kRceCW74f
+/kBpSegRKEun8IxOF9SaxftA97nFCaXCmHx2UcMOa+2TmQ8iOoC1wYOIuUtH1iM23BhefQf0El1AnEwd
+HEJTa+tdEbYLfoHvw6i0m4b3TwyKd6E33HLf7yzVIbgTcg0F84FzzZ65qX5BXqCOqXVy0X5gV9ifSqdT
+3CfMv8YNb//2vf2zgBoickYrJ2sKUWOqaAWNqVKICDhaAT1Gqj1dBKs7DB2HAp3iP7h0Go4n+38dGv9d
+LhgsLp+v527x3MfGm2LN/lDFc7IPYhtheF2r/l4+StXLM4F1YeIFz8V3Efcp/PrpUwq7ZPeMfxEySXwv
+bsP+sBfV2Xe4vw36G4G+PxPV2Rl/zl983WdE5CeUTRwR0wubb0Gz+9sL/xMi62IZNdTkkVlu4CDIuUGI
+Mr8Rf2/FjcZSPME4TqYL1U9Lcr+SXrua2RWt6ObSmhDS7bFmt3jJIUr44EdBIukUaBD+tpNPddN2Wq3B
+MJ8+b3o97/c48Wmf4cNbk0at54rTbMlFgjubozHu19sk0bS76ZaVvKuta8NpfKXsmepk4QgnB4ljGIzJ
+YvnT3yqk3v99+U+arMshTyZ3Ry65Nlteo/4/AAD//7a0wPGrCAAA
+`,
+}

@@ -93,7 +93,7 @@ func (f *File) parseMessageField(gField *protogen.Field) MessageField {
 
 	sField.JsName = tagMap["name"]
 	if sField.JsName == "" {
-		sField.JsName = SnakeCase(sField.Name)
+		sField.JsName = sField.Name
 	}
 
 	//基础类型

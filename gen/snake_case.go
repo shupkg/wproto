@@ -1,46 +1,39 @@
 package gen
 
-func SnakeCase(name string) string {
-	v := []byte(name)
+import (
+	"regexp"
+	"strings"
+)
 
-	l := 0
-	for _, c := range v {
-		if 'A' <= c && c <= 'Z' {
-			l++
-		}
+//小写下划线
+func LowerName(name string) string {
+	if len(name) == 0 {
+		return ""
 	}
-
-	t := make([]byte, 0, l)
-
-	for i := 0; i < len(v); i++ {
-		if 'A' <= v[i] && v[i] <= 'Z' {
-			applyHoldWords(v, i)
-			if i > 0 {
-				t = append(t, '_')
-			}
-			t = append(t, v[i]+('a'-'A'))
-		} else {
-			t = append(t, v[i])
-		}
+	name = regexp.MustCompile(`([\W]+)`).ReplaceAllString(name, "_")
+	name = regexp.MustCompile(`([A-Z]+)`).ReplaceAllString(name, "_$1")
+	name = strings.ToLower(name)
+	name = strings.Trim(name, "_")
+	if name[0] >= '0' && name[0] <= '9' {
+		name = "_" + name
 	}
-	return string(t)
+	return name
 }
 
-func applyHoldWords(name []byte, i int) {
-	for _, hold := range HoldWords {
-		if name[i] == hold[0] && i+len(hold) <= len(name) {
-			for j := range hold {
-				if name[i+j] != hold[j] {
-					return
-				}
-			}
-			for j := range hold {
-				if j > 0 {
-					name[i+j] = hold[j] + ('a' - 'A')
-				}
-			}
-		}
+//大写驼峰
+func UpperName(name string) string {
+	if len(name) == 0 {
+		return ""
 	}
+	name = regexp.MustCompile(`([\W]+)`).ReplaceAllString(name, "_")
+	name = regexp.MustCompile(`(\d+[a-z])`).ReplaceAllStringFunc(name, strings.ToUpper)
+	name = regexp.MustCompile(`(_[A-Za-z0-9])`).ReplaceAllStringFunc(name, func(s string) string {
+		return strings.ToUpper(s[1:2]) + s[2:]
+	})
+	if name[0] >= '0' && name[0] <= '9' {
+		name = "_" + name
+	} else {
+		name = strings.ToUpper(name[:1]) + name[1:]
+	}
+	return name
 }
-
-var HoldWords = []string{"ID", "URL", "IP"}
