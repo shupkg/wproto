@@ -120,7 +120,7 @@ func (g *ProtoGen) Run() error {
 		if g.Mod == "" {
 			grpcOpt += "paths=source_relative"
 		} else {
-			grpcOpt += fmt.Sprintf("--go-grpc_opt=module=%s", g.Mod)
+			grpcOpt += fmt.Sprintf("module=%s", g.Mod)
 		}
 		if g.GrpcNoUnimplementedServers {
 			grpcOpt += ",requireUnimplementedServers=false"
